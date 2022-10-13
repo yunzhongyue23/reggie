@@ -30,9 +30,19 @@ public class EmployeeController {
         password = DigestUtils.md5DigestAsHex(password.getBytes());
 //      根据用户提交的用户名username查询数据库
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+//       条件构造器
         queryWrapper.eq(Employee::getUsername,employee.getUsername());
+//        查询出一个雇员
         Employee emp = employeeService.getOne(queryWrapper);
-        return null;
+        if (emp==null){
+            return Result.error("登录失败");
+        }if (!emp.getPassword().equals(password)){
+            return Result.error("登录失败");
+        }if (emp.getStatus()==0){
+            return Result.error("账号已禁用");
+        }
+        session.setAttribute("employee",emp.getId());
+        return Result.success(emp);
     }
 
 }
